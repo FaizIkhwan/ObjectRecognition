@@ -24,17 +24,23 @@ namespace Object_recognition
             populateCmb(cmbPretained, "*.cfg");
         }
 
+        /**
+         * Button LoacPic click listener
+         **/
         private void btnLoadPic_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog op = new OpenFileDialog() { Filter = "JPEG|*.jpg" })
+            using (OpenFileDialog op = new OpenFileDialog() { Filter = "JPEG|*.jpg" }) // file type
             {
                 if (op.ShowDialog() == DialogResult.OK)
                 {
-                    picResult.Image = Image.FromFile(op.FileName);
+                    picResult.Image = Image.FromFile(op.FileName); // load image
                 }
             }
         }
 
+        /**
+         * Button add
+         **/    
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (cmbModels.Text != "")
@@ -46,17 +52,26 @@ namespace Object_recognition
             }
         }
 
+        /**
+         * Button Clear
+         **/
         private void btnClear_Click(object sender, EventArgs e)
         {
             lstData.Items.Clear();
         }
 
+        /**
+         * Button Execute
+         **/
         private void btnExecute_Click(object sender, EventArgs e)
         {
             saveVOCName();
             executeYOLO();
         }
 
+        /**
+         *  Write on voc.names file
+         **/
         private void saveVOCName()
         {
             StreamWriter saveFile = new StreamWriter("voc.names");
@@ -83,7 +98,7 @@ namespace Object_recognition
         {
             var configDetect = new ConfigurationDetector();
             var config = configDetect.Detect();
-            var sw = new Stopwatch();
+            var sw = new Stopwatch(); // To check runtime
             sw.Start();
 
             using (var yoloWrap = new YoloWrapper(cmbPretained.Text, cmbPretained.Text.Replace(".cfg", "") + ".weights", cmbModels.Text)) // kalau ada error, check library
@@ -93,8 +108,8 @@ namespace Object_recognition
                 using (MemoryStream mem = new MemoryStream())
                 {
                     picResult.Image.Save(mem, ImageFormat.Png);
-                    var items = yoloWrap.Detect(mem.ToArray());
-                    dgTrackedObject.DataSource = items;
+                    var items = yoloWrap.Detect(mem.ToArray()); // Detect
+                    dgTrackedObject.DataSource = items; // Each attribute of the detected object are stored in dgTrackedObject
                     drawRectangle();
                 }
             }
@@ -104,6 +119,9 @@ namespace Object_recognition
             prgStatus.Value = 100;
         }
 
+        /**
+         *  Show semua file yang *.names / *.cfg
+         **/
         private void populateCmb(ComboBox combo, string fileType)
         {
             DirectoryInfo dInfo = new DirectoryInfo(Path.GetDirectoryName(Application.ExecutablePath));
@@ -139,6 +157,7 @@ namespace Object_recognition
                     using (var oy = new SolidBrush(Color.FromArgb(150, 255, 255, 102)))
                     using (var pen = getBrush(Convert.ToDouble(conf), Convert.ToInt32(width)))
                     {
+                        // Draw rectangle
                         Rectangle rect;
                         rect = new Rectangle(Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(width), Convert.ToInt32(height));
                         canvas.DrawRectangle(pen, rect);
